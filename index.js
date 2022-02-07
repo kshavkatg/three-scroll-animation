@@ -13,6 +13,20 @@ window.onbeforeunload = function () {
   window.scrollTo(0, 0);
 }
 
+/**
+ * Cursor
+ */
+ const cursor = {}
+ cursor.x = 0
+ cursor.y = 0
+
+ window.addEventListener('mousemove', (event) =>
+ {
+    cursor.x = event.clientX / sizes.width - 0.5
+    cursor.y = event.clientY / sizes.height - 0.5
+    console.log(cursor)
+ })
+
 // Debug
 const gui = new dat.GUI()
 const parameters = {}
@@ -145,9 +159,9 @@ gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
 /**
  * Helpers
  */
- const directLightHelper = new THREE.DirectionalLightHelper( directLight, 1, new THREE.Color('#0000ff') );
- const gridHelper = new THREE.GridHelper( 100, 100 );
- scene.add( gridHelper, directLightHelper );
+//  const directLightHelper = new THREE.DirectionalLightHelper( directLight, 1, new THREE.Color('#0000ff') );
+//  const gridHelper = new THREE.GridHelper( 100, 100 );
+//  scene.add( gridHelper, directLightHelper );
 
  function moveCamera() {
   let startZrotation = false
@@ -180,6 +194,12 @@ document.body.onscroll = moveCamera;
  const tick = () =>
  {
      const elapsedTime = clock.getElapsedTime()
+    if(model) model.position.y += Math.sin(elapsedTime)* 0.001
+
+    const parallaxX = cursor.x * 0.05
+    const parallaxY = - cursor.y * 0.05
+    camera.position.x = parallaxX
+    camera.position.y = parallaxY
  
      // Update controls
      controls.update()
