@@ -24,7 +24,6 @@ window.onbeforeunload = function () {
  {
     cursor.x = event.clientX / sizes.width - 0.5
     cursor.y = event.clientY / sizes.height - 0.5
-    console.log(cursor)
  })
 
 // Debug
@@ -163,7 +162,7 @@ gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
 //  const gridHelper = new THREE.GridHelper( 100, 100 );
 //  scene.add( gridHelper, directLightHelper );
 
- function moveCamera() {
+ function transformAvatar() {
   let startZrotation = false
   const t = document.body.getBoundingClientRect().top;
   let range = t * -0.0005
@@ -172,19 +171,19 @@ gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
   if (range < 1.4) {
      model.rotation.y = -range;
      // lift litle bit on y axis
-     model.position.y = range * 0.5 -2.6
+     model.position.y = range * 0.5 -2.6    
   }
-  if (range > 0.5) {
+  model.position.z = -range * 1.2
+  
+  if (range > 0.5 && range < 2) {
     modelGroup.rotation.z = -(range-0.5)
   }
+
+  if (range > 2 && range < 2.5) model.rotation.y = +(range-2 - 1.4)
   
-  model.position.z = t * 0.001
-  // camera.position.z = t * -0.01;
-  // camera.position.x = t * -0.0002;
-  // camera.rotation.y = t * -0.0002;
 }
 
-document.body.onscroll = moveCamera;
+document.body.onscroll = transformAvatar;
 
 /**
  * Animate

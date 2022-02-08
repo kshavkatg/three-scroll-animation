@@ -1,7 +1,8 @@
 {
-  "homepage": "https://kshavkatg.github.io/three-scroll-animation/",
+  "private": false,
   "name": "three-js-scroll-animation",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "homepage": "https://kshavkatg.github.io/three-scroll-animation/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,7 +11,8 @@
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
-    "vite": "^2.7.2"
+    "vite": "^2.7.2",
+    "gh-pages": "^3.2.3"
   },
   "dependencies": {
     "dat.gui": "^0.7.7",
