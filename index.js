@@ -110,18 +110,18 @@ camera.position.x = 0
 camera.position.y = 0
 camera.position.z = 1
 
-gui.add(parameters, 'cameraNear').min(-10).max(10).step(0.001).onChange((num) => {
-  camera.near = num
-})
-gui.add(parameters, 'modelX').min(-10).max(10).step(0.01).onChange((x) => {
-  model.position.x = x
-})
-gui.add(parameters, 'modelY').min(-10).max(10).step(0.01).onChange((y) => {
-  model.position.y = y
-})
-gui.add(parameters, 'modelZ').min(-10).max(10).step(0.01).onChange((z) => {
-  model.position.z = z
-})
+// gui.add(parameters, 'cameraNear').min(-10).max(10).step(0.001).onChange((num) => {
+//   camera.near = num
+// })
+// gui.add(parameters, 'modelX').min(-10).max(10).step(0.01).onChange((x) => {
+//   model.position.x = x
+// })
+// gui.add(parameters, 'modelY').min(-10).max(10).step(0.01).onChange((y) => {
+//   model.position.y = y
+// })
+// gui.add(parameters, 'modelZ').min(-10).max(10).step(0.01).onChange((z) => {
+//   model.position.z = z
+// })
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg')
@@ -142,18 +142,18 @@ directLight.position.y = 2
 const hemisphereLight = new THREE.HemisphereLight( parameters.topColor, parameters.bottomColor, 2 );
 scene.add( hemisphereLight, directLight );
 
-gui.addColor(parameters, 'directLightColor').onChange((color)=> {
-  directLight.color = new THREE.Color(color)
-})
-gui.addColor(parameters, 'topColor').onChange((color)=> {
-  hemisphereLight.color = new THREE.Color(color)
-})
-gui.addColor(parameters, 'bottomColor').onChange((color)=> {
-  hemisphereLight.groundColor = new THREE.Color(color)
-})
-gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
-  scene.background = new THREE.Color(color)
-})
+// gui.addColor(parameters, 'directLightColor').onChange((color)=> {
+//   directLight.color = new THREE.Color(color)
+// })
+// gui.addColor(parameters, 'topColor').onChange((color)=> {
+//   hemisphereLight.color = new THREE.Color(color)
+// })
+// gui.addColor(parameters, 'bottomColor').onChange((color)=> {
+//   hemisphereLight.groundColor = new THREE.Color(color)
+// })
+// gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
+//   scene.background = new THREE.Color(color)
+// })
 
 /**
  * Helpers

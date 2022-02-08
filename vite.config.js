@@ -1,5 +1,5 @@
 const ASSET_URL = process.env.ASSET_URL || '';
 
 export default { 
-  base: `${ASSET_URL}/`,
+  base: `https://kshavkatg.github.io/three-scroll-animation/`,
 }
