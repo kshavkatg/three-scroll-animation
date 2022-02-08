@@ -111,3 +111,15 @@ canvas {
     width: 30%;
   }
 
+  @media screen and (max-width: 600px) {
+    header {
+      grid-column: 1 / 14  !important;
+    }
+    h1 {
+      font-size: 7rem;
+    }
+    section{
+      grid-column: 1 / 14  !important;
+      padding: 20px !important
+    }
+  }
