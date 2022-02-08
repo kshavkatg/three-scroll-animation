@@ -91,7 +91,7 @@ const modelGroup = new THREE.Group()
 
 const gltfLoader = new GLTFLoader()
 gltfLoader.load(
-  './assets/model.glb',
+  './model.glb',
   (gltf) =>
   {
       model = gltf.scene
