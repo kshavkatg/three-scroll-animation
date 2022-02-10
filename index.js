@@ -3,12 +3,19 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { GlitchPass } from './GlitchPass.js'
+import { GlitchPass } from './lib/GlitchPass.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js'
 import * as dat from 'dat.gui'
+
+import negxUrl from './assets/negx.jpg'
+import negyUrl from './assets/negy.jpg'
+import negzUrl from './assets/negz.jpg'
+import posxUrl from './assets/posx.jpg'
+import posyUrl from './assets/posy.jpg'
+import poszUrl from './assets/posz.jpg'
 
 // force page to start on top
 window.onbeforeunload = function () {
@@ -72,12 +79,12 @@ const cubeTextureLoader = new THREE.CubeTextureLoader()
  * Environment map
  */
  const environmentMap = cubeTextureLoader.load([
-  './posx.jpg',
-  './negx.jpg',
-  './posy.jpg',
-  './negy.jpg',
-  './posz.jpg',
-  './negz.jpg'
+  posxUrl,
+  negxUrl,
+  posyUrl,
+  negyUrl,
+  poszUrl,
+  negzUrl
 ])
 environmentMap.encoding = THREE.sRGBEncoding
 
