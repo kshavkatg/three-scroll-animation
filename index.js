@@ -1,135 +1,13 @@
 import './style.css'
 
-// GLITCH
-import {
-	DataTexture,
-	FloatType,
-	MathUtils,
-	RedFormat,
-	LuminanceFormat,
-	ShaderMaterial,
-	UniformsUtils
-} from 'three';
-import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js'
-import { DigitalGlitch } from 'three/examples/jsm/shaders/DigitalGlitch.js';
-
-class GlitchPass extends Pass {
-
-	constructor( dt_size = 64 ) {
-
-		super();
-
-		if ( DigitalGlitch === undefined ) console.error( 'THREE.GlitchPass relies on DigitalGlitch' );
-
-		const shader = DigitalGlitch;
-
-		this.uniforms = UniformsUtils.clone( shader.uniforms );
-
-		this.uniforms[ 'tDisp' ].value = this.generateHeightmap( dt_size );
-
-		this.material = new ShaderMaterial( {
-			uniforms: this.uniforms,
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
-		} );
-
-		this.fsQuad = new FullScreenQuad( this.material );
-
-		this.goWild = false;
-		this.curF = 0;
-		this.generateTrigger();
-
-	}
-
-	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		if ( renderer.capabilities.isWebGL2 === false ) this.uniforms[ 'tDisp' ].value.format = LuminanceFormat;
-
-		this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
-		this.uniforms[ 'seed' ].value = Math.random();//default seeding
-		this.uniforms[ 'byp' ].value = 0;
-
-		if ( this.curF % this.randX == 0 || this.goWild == true ) {
-
-			this.uniforms[ 'amount' ].value = Math.random() / 30;
-			this.uniforms[ 'angle' ].value = MathUtils.randFloat( - Math.PI, Math.PI );
-			this.uniforms[ 'seed_x' ].value = MathUtils.randFloat( - 1, 1 );
-			this.uniforms[ 'seed_y' ].value = MathUtils.randFloat( - 1, 1 );
-			this.uniforms[ 'distortion_x' ].value = MathUtils.randFloat( 0, 1 );
-			this.uniforms[ 'distortion_y' ].value = MathUtils.randFloat( 0, 1 );
-			this.curF = 0;
-			this.generateTrigger();
-      this.curF ++;
-
-		} else if ( this.curF % this.randX < this.randX / 5 ) {
-
-			this.uniforms[ 'amount' ].value = Math.random() / 90;
-			this.uniforms[ 'angle' ].value = MathUtils.randFloat( - Math.PI, Math.PI );
-			this.uniforms[ 'distortion_x' ].value = MathUtils.randFloat( 0, 1 );
-			this.uniforms[ 'distortion_y' ].value = MathUtils.randFloat( 0, 1 );
-			this.uniforms[ 'seed_x' ].value = MathUtils.randFloat( - 0.3, 0.3 );
-			this.uniforms[ 'seed_y' ].value = MathUtils.randFloat( - 0.3, 0.3 );
-      this.curF ++;
-		} else if ( this.goWild == false ) {
-      this.curF += 0.5;
-			this.uniforms[ 'byp' ].value = 5;
-
-		}
-
-		// this.curF ++;
-
-		if ( this.renderToScreen ) {
-
-			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
-
-		} else {
-
-			renderer.setRenderTarget( writeBuffer );
-			if ( this.clear ) renderer.clear();
-			this.fsQuad.render( renderer );
-
-		}
-
-	}
-
-	generateTrigger() {
-
-		this.randX = MathUtils.randInt( 120, 240 );
-
-	}
-
-	generateHeightmap( dt_size ) {
-
-		const data_arr = new Float32Array( dt_size * dt_size );
-		const length = dt_size * dt_size;
-
-		for ( let i = 0; i < length; i ++ ) {
-
-			const val = MathUtils.randFloat( 0, 1 );
-			data_arr[ i ] = val;
-
-		}
-
-		const texture = new DataTexture( data_arr, dt_size, dt_size, RedFormat, FloatType );
-		texture.needsUpdate = true;
-		return texture;
-
-	}
-
-}
-//////////////////////////////////////////§
-
-
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-// import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js'
+import { GlitchPass } from './GlitchPass.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js'
-// import { DigitalGlitch } from 'three/examples/jsm/shaders/DigitalGlitch.js'
 import * as dat from 'dat.gui'
 
 // force page to start on top
@@ -194,12 +72,12 @@ const cubeTextureLoader = new THREE.CubeTextureLoader()
  * Environment map
  */
  const environmentMap = cubeTextureLoader.load([
-  '/ev/posx.jpg',
-  '/ev/negx.jpg',
-  '/ev/posy.jpg',
-  '/ev/negy.jpg',
-  '/ev/posz.jpg',
-  '/ev/negz.jpg'
+  './posx.jpg',
+  './negx.jpg',
+  './posy.jpg',
+  './negy.jpg',
+  './posz.jpg',
+  './negz.jpg'
 ])
 environmentMap.encoding = THREE.sRGBEncoding
 
@@ -217,8 +95,8 @@ scene.environment = environmentMap
             child.material.needsUpdate = true
             // tell to render even if model part is not fitting the camera
             child.frustumCulled = false
-            child.castShadow = true
-            child.receiveShadow = true
+            // child.castShadow = true
+            // child.receiveShadow = true
 
             child.material.needsUpdate = true
             child.material.envMapIntensity = 3
@@ -238,9 +116,9 @@ const sphere = new THREE.Mesh(
   new THREE.SphereBufferGeometry(100, 32, 32), 
   sphereMaterial
 )
-gui.add(parameters, 'sphereOpacity').min(0).max(1).step(0.001).onChange((num) => {
-  sphereMaterial.opacity = num
-})
+// gui.add(parameters, 'sphereOpacity').min(0).max(1).step(0.001).onChange((num) => {
+//   sphereMaterial.opacity = num
+// })
 
 scene.add(sphere)
 
@@ -271,18 +149,18 @@ camera.position.x = 0
 camera.position.y = 0
 camera.position.z = 1
 
-gui.add(parameters, 'cameraNear').min(-10).max(10).step(0.001).onChange((num) => {
-  camera.near = num
-})
-gui.add(parameters, 'modelX').min(-10).max(10).step(0.01).onChange((x) => {
-  model.position.x = x
-})
-gui.add(parameters, 'modelY').min(-10).max(10).step(0.01).onChange((y) => {
-  model.position.y = y
-})
-gui.add(parameters, 'modelZ').min(-10).max(10).step(0.01).onChange((z) => {
-  model.position.z = z
-})
+// gui.add(parameters, 'cameraNear').min(-10).max(10).step(0.001).onChange((num) => {
+//   camera.near = num
+// })
+// gui.add(parameters, 'modelX').min(-10).max(10).step(0.01).onChange((x) => {
+//   model.position.x = x
+// })
+// gui.add(parameters, 'modelY').min(-10).max(10).step(0.01).onChange((y) => {
+//   model.position.y = y
+// })
+// gui.add(parameters, 'modelZ').min(-10).max(10).step(0.01).onChange((z) => {
+//   model.position.z = z
+// })
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'),
@@ -365,18 +243,29 @@ controls.enableDamping = true
 /**
  * Lights
  */
-const directLight = new THREE.SpotLight( 0xff0000, 50, 10, 3 )
+const directLight = new THREE.SpotLight( 0xff0000, 100, 10, 3 )
 directLight.position.set(0, -3, 0.5)
 directLight.castShadow = true
 directLight.shadow.normalBias = 0.05
+directLight.shadow.mapSize.set(256, 256)
+directLight.shadow.camera.far = 5
 
-const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x0000ff, 3)
+const whiteLight = new THREE.SpotLight( 0xffffff, 5 )
+whiteLight.position.set(-1, 5, 1)
+whiteLight.castShadow = true
+whiteLight.shadow.normalBias = 0.1
+whiteLight.shadow.mapSize.set(256, 256)
+whiteLight.shadow.camera.far = 7
+scene.add(whiteLight)
+
+
+const hemisphereLight = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(hemisphereLight)
 
-const bluePointLight = new THREE.PointLight( "#0000ff", 15, 10 );
-bluePointLight.position.set(-1, -2, 2)
+const bluePointLight = new THREE.PointLight( "#0000ff", 14, 20 );
+bluePointLight.position.set(2, -2, 3)
 
-const redPointLight = new THREE.PointLight( "#ff0000", 15, 10 );
+const redPointLight = new THREE.PointLight( "#ff0000", 14, 20 );
 redPointLight.position.set(1, -2, 3)
 
 // const hemisphereLight = new THREE.HemisphereLight( parameters.topColor, parameters.bottomColor, 3 );
@@ -388,18 +277,18 @@ const bluePointLightHelper = new THREE.PointLightHelper( bluePointLight, 0.2 );
 const redPointLightHelper = new THREE.PointLightHelper( redPointLight, 0.2 );
 // scene.add( redPointLightHelper, bluePointLightHelper );
 
-gui.addColor(parameters, 'directLightColor').onChange((color)=> {
-  directLight.color = new THREE.Color(color)
-})
-gui.addColor(parameters, 'topColor').onChange((color)=> {
-  hemisphereLight.color = new THREE.Color(color)
-})
-gui.addColor(parameters, 'bottomColor').onChange((color)=> {
-  hemisphereLight.groundColor = new THREE.Color(color)
-})
-gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
-  scene.background = new THREE.Color(color)
-})
+// gui.addColor(parameters, 'directLightColor').onChange((color)=> {
+//   directLight.color = new THREE.Color(color)
+// })
+// gui.addColor(parameters, 'topColor').onChange((color)=> {
+//   hemisphereLight.color = new THREE.Color(color)
+// })
+// gui.addColor(parameters, 'bottomColor').onChange((color)=> {
+//   hemisphereLight.groundColor = new THREE.Color(color)
+// })
+// gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
+//   scene.background = new THREE.Color(color)
+// })
 
 
  function transformAvatar() {
@@ -414,6 +303,7 @@ gui.addColor(parameters, 'sceneBackground').onChange((color)=> {
   }
   avatarGroup.position.z = -range * 1.2
   sphereMaterial.opacity = range * 0.5
+  whiteLight.intensity = range * 20
   
   if (range > 0.5 && range < 2) {
     modelGroup.rotation.z = -(range-0.5)
@@ -438,7 +328,7 @@ document.body.onscroll = transformAvatar;
     const angle = elapsedTime * 0.5
     bluePointLight.position.x = Math.cos(angle) * 5
     bluePointLight.position.z = Math.abs(Math.sin(angle)) * 4 - 2
-    bluePointLight.position.y = Math.sin(elapsedTime * 2) - 2
+    bluePointLight.position.y = Math.sin(angle * 2) + Math.sin(elapsedTime * 2)
 
     const angle2 = elapsedTime * 0.32
     redPointLight.position.x = Math.cos(angle2) * 5
