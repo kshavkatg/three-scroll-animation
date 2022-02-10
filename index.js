@@ -1,7 +1,7 @@
 import './style.css'
 
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GlitchPass } from './lib/GlitchPass.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
@@ -93,17 +93,17 @@ scene.environment = environmentMap
 /**
  * Update all materials
  */
- const updateAllMaterials = () =>
+ const updateAllMaterials = (gltfModel) =>
  {
-     scene.traverse((child) =>
+  gltfModel.traverse((child) =>
      {
          if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial)
          {
             child.material.needsUpdate = true
             // tell to render even if model part is not fitting the camera
             child.frustumCulled = false
-            // child.castShadow = true
-            // child.receiveShadow = true
+            child.castShadow = true
+            child.receiveShadow = true
 
             child.material.needsUpdate = true
             child.material.envMapIntensity = 3
@@ -146,7 +146,7 @@ gltfLoader.load(
       modelGroup.add(avatarGroup)
       scene.add(modelGroup)
 
-      updateAllMaterials()
+      updateAllMaterials(model)
   }
 )
 
@@ -244,8 +244,8 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 // Controls
-const controls = new OrbitControls(camera, document.querySelector('#bg'))
-controls.enableDamping = true
+// const controls = new OrbitControls(camera, document.querySelector('#bg'))
+// controls.enableDamping = true
 
 /**
  * Lights
@@ -257,16 +257,15 @@ directLight.shadow.normalBias = 0.05
 directLight.shadow.mapSize.set(256, 256)
 directLight.shadow.camera.far = 5
 
-const whiteLight = new THREE.SpotLight( 0xffffff, 5 )
-whiteLight.position.set(-1, 5, 1)
-whiteLight.castShadow = true
-whiteLight.shadow.normalBias = 0.1
-whiteLight.shadow.mapSize.set(256, 256)
-whiteLight.shadow.camera.far = 7
-scene.add(whiteLight)
+// const whiteLight = new THREE.SpotLight( 0xffffff, 5 )
+// whiteLight.position.set(-1, 5, 1)
+// whiteLight.castShadow = true
+// whiteLight.shadow.normalBias = 0.1
+// whiteLight.shadow.mapSize.set(256, 256)
+// whiteLight.shadow.camera.far = 7
+// scene.add(whiteLight)
 
-
-const hemisphereLight = new THREE.AmbientLight(0xffffff, 0.5)
+const hemisphereLight = new THREE.AmbientLight(0xffffff, 2)
 scene.add(hemisphereLight)
 
 const bluePointLight = new THREE.PointLight( "#0000ff", 14, 20 );
@@ -278,10 +277,10 @@ redPointLight.position.set(1, -2, 3)
 // const hemisphereLight = new THREE.HemisphereLight( parameters.topColor, parameters.bottomColor, 3 );
 avatarGroup.add( redPointLight, bluePointLight, directLight );
 
-const directLightHelper = new THREE.DirectionalLightHelper( directLight, 1, new THREE.Color('#0000ff') );
-const gridHelper = new THREE.GridHelper( 100, 100 );
-const bluePointLightHelper = new THREE.PointLightHelper( bluePointLight, 0.2 );
-const redPointLightHelper = new THREE.PointLightHelper( redPointLight, 0.2 );
+// const directLightHelper = new THREE.DirectionalLightHelper( directLight, 1, new THREE.Color('#0000ff') );
+// const gridHelper = new THREE.GridHelper( 100, 100 );
+// const bluePointLightHelper = new THREE.PointLightHelper( bluePointLight, 0.2 );
+// const redPointLightHelper = new THREE.PointLightHelper( redPointLight, 0.2 );
 // scene.add( redPointLightHelper, bluePointLightHelper );
 
 // gui.addColor(parameters, 'directLightColor').onChange((color)=> {
@@ -299,7 +298,6 @@ const redPointLightHelper = new THREE.PointLightHelper( redPointLight, 0.2 );
 
 
  function transformAvatar() {
-  let startZrotation = false
   const t = document.body.getBoundingClientRect().top;
   let range = t * -0.0005
 
@@ -309,8 +307,11 @@ const redPointLightHelper = new THREE.PointLightHelper( redPointLight, 0.2 );
      avatarGroup.position.y = range * 0.5 -2.6    
   }
   avatarGroup.position.z = -range * 1.2
+  // overlay red background on scroll
   sphereMaterial.opacity = range * 0.5
-  whiteLight.intensity = range * 20
+    
+  // increase light intensity on scroll
+  if (range*2 > 2 ) hemisphereLight.intensity = range * 3
   
   if (range > 0.5 && range < 2) {
     modelGroup.rotation.z = -(range-0.5)
@@ -348,7 +349,7 @@ document.body.onscroll = transformAvatar;
     camera.position.y = parallaxY
  
      // Update controls
-     controls.update()
+    //  controls.update()
  
      // Render
      renderer.render(scene, camera)
